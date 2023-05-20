@@ -1,0 +1,86 @@
+import os
+import numpy as np
+from numpy import save
+from keras.utils import to_categorical, load_img, img_to_array
+from keras.models import Sequential, Model
+from keras.layers import Dense, Conv2D, MaxPooling2D, Flatten, Activation, Dropout, LeakyReLU
+from keras.optimizers import SGD
+import matplotlib.pyplot as plt
+#load folder datasets
+folder = "/content/drive/MyDrive/AI in Business/AI Project/Project 3/Flowers/Các loại hoa"
+#tiền xử lý dữ liệu
+photos,labels = list(), list()
+for file in os.listdir(folder):
+  output = 0
+  if file.startswith('mai'):
+    output = 0
+  elif file.startswith('rose'):
+    output = 1
+  elif file.startswith('dao'):
+    output = 2
+  elif file.startswith('duong'):
+    output = 3
+  elif file.startswith('lav'):
+    output = 4
+  if output is not None:
+    img = load_img(os.path.join(folder,file), target_size=(200,200,3))
+    img = img_to_array(img)
+    photos.append(img)
+    labels.append(output)
+#Xác định kiểu cho mảng
+photos = np.array(photos)
+labels = np.array(labels)
+
+x = photos
+y = labels
+
+y.shape
+
+from keras.utils import to_categorical
+y = to_categorical(y,50)
+x = x.astype('float32') / 255 
+
+from keras.models import Sequential
+from keras.layers import Conv2D, MaxPooling2D, Dense, Flatten 
+
+model = Sequential()
+model.add(Conv2D(32, kernel_size=(3,3), activation='linear', input_shape=(200,200,3), padding='same'))
+model.add(MaxPooling2D((2,2),padding='same'))
+model.add(Conv2D(64, kernel_size=(3,3), activation='linear', padding='same'))
+model.add(MaxPooling2D((2,2),padding='same'))
+model.add(Conv2D(128, kernel_size=(3,3), activation='linear', padding='same'))
+model.add(MaxPooling2D((2,2),padding='same'))
+#model.add(Dropout(:0.25))
+# 3 lần tích chập
+
+model.add(Flatten())
+#Trải bằng lệnh flatten
+
+model.add(Dense(128, activation='relu'))
+model.add(Dense(50, activation='softmax'))
+
+model.summary()
+
+from keras.losses import categorical_crossentropy
+model.compile(loss=categorical_crossentropy, optimizer='adam', metrics=['accuracy'])
+
+model.fit(x, y, epochs=20, batch_size=128, verbose=1)
+
+test_loss, test_acc = model.evaluate(x, y)
+print('Accuracy rate: ', test_acc)
+
+#PREDICT
+import numpy as np
+from keras.utils import load_img, img_to_array
+#Tải ảnh
+filename = "/content/drive/MyDrive/AI in Business/AI Project/Project 3/Flowers/hoa mai.jpg"
+img = load_img(filename,target_size=(200,200))
+plt.imshow(img)
+#chuyển ảnh thành mảng
+img = img_to_array(img)
+#Định dạng thành mẫu dữ liệu với 3 kênh
+img = img.reshape(1,200,200,3)
+# Chuẩn bị dữ liệu dạng pixel
+img = img.astype('float32')
+img = img/255.0
+np.argmax(model.predict(img),axis=1)
