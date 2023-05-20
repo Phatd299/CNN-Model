@@ -6,6 +6,7 @@ from keras.models import Sequential, Model
 from keras.layers import Dense, Conv2D, MaxPooling2D, Flatten, Activation, Dropout, LeakyReLU
 from keras.optimizers import SGD
 import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
 #load folder datasets
 folder = "/content/drive/MyDrive/AI in Business/AI Project/Project 3/Flowers/Các loại hoa"
 #tiền xử lý dữ liệu
@@ -31,14 +32,21 @@ for file in os.listdir(folder):
 photos = np.array(photos)
 labels = np.array(labels)
 
-x = photos
-y = labels
+x_train, x_test, y_train, y_test = train_test_split(photos,labels,test_size=0.2, random_state=42)
+x1=x_train
+x2=x_test
+y1=y_train
+y2=y_test
 
-y.shape
+x_train=x_train.reshape(40,200,200,3)
+x_train = x_train.astype('float32') / 255
+
+x_test=x_test.reshape(10,200,200,3)
+x_test = x_test.astype('float32') / 255
 
 from keras.utils import to_categorical
-y = to_categorical(y,50)
-x = x.astype('float32') / 255 
+y_train = to_categorical(y_train,5)
+y_test = to_categorical(y_test,5) 
 
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Dense, Flatten 
@@ -50,26 +58,37 @@ model.add(Conv2D(64, kernel_size=(3,3), activation='linear', padding='same'))
 model.add(MaxPooling2D((2,2),padding='same'))
 model.add(Conv2D(128, kernel_size=(3,3), activation='linear', padding='same'))
 model.add(MaxPooling2D((2,2),padding='same'))
-#model.add(Dropout(:0.25))
-# 3 lần tích chập
+
 
 model.add(Flatten())
-#Trải bằng lệnh flatten
+
 
 model.add(Dense(128, activation='relu'))
-model.add(Dense(50, activation='softmax'))
+model.add(Dense(5, activation='softmax'))
 
 model.summary()
 
 from keras.losses import categorical_crossentropy
 model.compile(loss=categorical_crossentropy, optimizer='adam', metrics=['accuracy'])
 
-model.fit(x, y, epochs=20, batch_size=128, verbose=1)
+model.fit(x_train , y_train, epochs=50, batch_size=128, verbose=1)
 
-test_loss, test_acc = model.evaluate(x, y)
-print('Accuracy rate: ', test_acc)
+model_loss, model_acc = model.evaluate(x_test, y_test)
+print('Testing accuracy rate: ', model_acc)
 
-#PREDICT
+# TEST WITH TEST DATA
+for i in range(0,10):
+  img1=x2[i]
+  plt.subplot(2,5,i+1) 
+  plt.imshow(x_test[i])
+  img1=np.array(img1)
+  img1 = img1.reshape(1, 200, 200, 3)
+  img1=img1/255
+  print('Expectation', np.argmax(model.predict(img1),axis=-1))
+  print('Answer', y2[i])
+plt.show
+
+# PREDICT
 import numpy as np
 from keras.utils import load_img, img_to_array
 #Tải ảnh
