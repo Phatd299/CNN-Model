@@ -73,10 +73,11 @@ model.compile(loss=categorical_crossentropy, optimizer='adam', metrics=['accurac
 
 model.fit(x_train , y_train, epochs=50, batch_size=128, verbose=1)
 
+#TEST WITH TEST DATA
 model_loss, model_acc = model.evaluate(x_test, y_test)
+print('Loss rate: ', model_loss)
 print('Testing accuracy rate: ', model_acc)
 
-# TEST WITH TEST DATA
 for i in range(0,10):
   img1=x2[i]
   plt.subplot(2,5,i+1) 
