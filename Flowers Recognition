@@ -38,10 +38,10 @@ x2=x_test
 y1=y_train
 y2=y_test
 
-x_train=x_train.reshape(40,200,200,3)
+x_train=x_train.reshape(198,200,200,3)
 x_train = x_train.astype('float32') / 255
 
-x_test=x_test.reshape(10,200,200,3)
+x_test=x_test.reshape(50,200,200,3)
 x_test = x_test.astype('float32') / 255
 
 from keras.utils import to_categorical
@@ -89,7 +89,7 @@ for i in range(0,10):
   print('Answer', y2[i])
 plt.show
 
-# PREDICT
+#PREDICT
 import numpy as np
 from keras.utils import load_img, img_to_array
 #Tải ảnh
